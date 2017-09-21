@@ -5,16 +5,20 @@ import './planc.styl'
 
 export default class Plank extends Component {
   static propTypes = {
-    top: PropTypes.number.isRequired
+    bottom: PropTypes.number.isRequired,
+    onPositionChange: PropTypes.func.isRequired
   }
 
   constructor() {
     super()
 
-    this.MAX = 800 - 300
+    this.FIELD_WIDTH = 800
+    this.PLANC_HEIGHT = 40
+    this.PLANC_WIDTH = 300
+    this.MAX = this.FIELD_WIDTH - this.PLANC_WIDTH
     this.MIN = 0
     this.STEP = 15
-    this.state = { position: 800 / 2 - 300 / 2 }
+    this.state = { xPosition: this.FIELD_WIDTH / 2 - this.PLANC_WIDTH / 2 }
 
     this.toRightInterval = null
     this.toLeftInterval = null
@@ -22,14 +26,14 @@ export default class Plank extends Component {
     this.onKeyDown = event => {
       if (event.key === 'ArrowRight' && !this.toRightInterval) {
         this.toRightInterval = setInterval(() => {
-          const nextTik = this.state.position + this.STEP
-          this.setState({ position: nextTik >= this.MAX ? this.MAX : nextTik })
+          const nextTik = this.state.xPosition + this.STEP
+          this.set(nextTik >= this.MAX ? this.MAX : nextTik)
         }, 10)
       }
       if (event.key === 'ArrowLeft' && !this.toLeftInterval) {
         this.toLeftInterval = setInterval(() => {
-          const nextTik = this.state.position - this.STEP
-          this.setState({ position: nextTik <= this.MIN ? this.MIN : nextTik })
+          const nextTik = this.state.xPosition - this.STEP
+          this.set(nextTik <= this.MIN ? this.MIN : nextTik)
         }, 10)
       }
     }
@@ -46,6 +50,18 @@ export default class Plank extends Component {
     }
   }
 
+  set(xPosition) {
+    const { bottom } = this.props
+    const { onPositionChange } = this.props
+    onPositionChange({
+      bottomLeftX: xPosition,
+      bottomLeftY: bottom,
+      topRightX: xPosition + this.PLANC_WIDTH,
+      topRightY: bottom + this.PLANC_HEIGHT
+    })
+    this.setState({ xPosition })
+  }
+
   componentDidMount() {
     document.addEventListener('keydown', this.onKeyDown)
     document.addEventListener('keyup', this.onKeyUp)
@@ -57,7 +73,17 @@ export default class Plank extends Component {
   }
 
   render() {
-    const { top } = this.props
-    return <div className="plank" style={{ left: this.state.position, top }} />
+    const { bottom } = this.props
+    return (
+      <div
+        className="plank"
+        style={{
+          left: this.state.xPosition,
+          bottom,
+          height: this.PLANC_HEIGHT,
+          width: this.PLANC_WIDTH
+        }}
+      />
+    )
   }
 }

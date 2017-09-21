@@ -28,6 +28,7 @@ export default class Ball extends Component {
       x: (this.MAX.x - this.MIN.x) / 2,
       y: (this.MAX.y - this.MIN.y) / 2
     }
+    this.SPEED = 5
     this.interval = null
     this.state = { x: this.INIT.x, y: this.INIT.y }
   }
@@ -42,14 +43,6 @@ export default class Ball extends Component {
     )
     const isDotMoving =
       !isDotOutByY && !isDotOutByX && !isDotInTopPlanc && !isDotInBottomPlanc
-
-    console.log(
-      `isDotOutByY: ${isDotOutByY}; ` +
-        `isDotOutByX: ${isDotOutByX}; ` +
-        `isDotInTopPlanc: ${isDotInTopPlanc}; ` +
-        `isDotInBottomPlanc: ${isDotInBottomPlanc}; ` +
-        `isDotMoving: ${isDotMoving}`
-    )
 
     if (isDotOutByY) {
       this.stop()
@@ -104,7 +97,7 @@ export default class Ball extends Component {
 
   move(from, to) {
     const lineFunc = utils.getLineFunc(from, to)
-    const speed = 1
+    const speed = this.SPEED
     const module = to.x - from.x > 0 ? 1 : -1
     const xIncrement =
       module * Math.sqrt(Math.pow(speed, 2) / (1 + Math.pow(lineFunc.a, 2)))
