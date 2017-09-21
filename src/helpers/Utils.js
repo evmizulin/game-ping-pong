@@ -21,6 +21,10 @@ class Utils {
 
     return func
   }
+
+  isDotInSquare({ x, y }, { bottomLeftX, bottomLeftY, topRightX, topRightY }) {
+    return x < topRightX && x > bottomLeftX && y < topRightY && y > bottomLeftY
+  }
 }
 
 export default new Utils()

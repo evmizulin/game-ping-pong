@@ -12,10 +12,26 @@ class Index extends Component {
     return (
       <div className="container">
         <Plank top={0} />
-        {Array(2)
+        {Array(1)
           .join('1')
           .split('1')
-          .map((item, i) => <Ball key={i} plancs={[{ x: 3, y: 8 }]} />)}
+          .map((item, i) => (
+            <Ball
+              key={i}
+              topPlank={{
+                bottomLeftX: 800 / 2 - 300 / 2,
+                bottomLeftY: 1000 - 40,
+                topRightX: 800 / 2 - 300 / 2 + 300,
+                topRightY: 1000
+              }}
+              bottomPlank={{
+                bottomLeftX: 800 / 2 - 300 / 2,
+                bottomLeftY: 0,
+                topRightX: 800 / 2 - 300 / 2 + 300,
+                topRightY: 40
+              }}
+            />
+          ))}
         <Plank top={960} />
       </div>
     )

@@ -6,12 +6,18 @@ import './ball.styl'
 
 export default class Ball extends Component {
   static propTypes = {
-    plancs: PropTypes.arrayOf(
-      PropTypes.shape({
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired
-      })
-    ).isRequired
+    topPlank: PropTypes.shape({
+      bottomLeftX: PropTypes.number.isRequired,
+      bottomLeftY: PropTypes.number.isRequired,
+      topRightX: PropTypes.number.isRequired,
+      topRightY: PropTypes.number.isRequired
+    }).isRequired,
+    bottomPlank: PropTypes.shape({
+      bottomLeftX: PropTypes.number.isRequired,
+      bottomLeftY: PropTypes.number.isRequired,
+      topRightX: PropTypes.number.isRequired,
+      topRightY: PropTypes.number.isRequired
+    }).isRequired
   }
   constructor(props) {
     super(props)
@@ -23,33 +29,41 @@ export default class Ball extends Component {
       y: (this.MAX.y - this.MIN.y) / 2
     }
     this.interval = null
-    this.plancs = props.plancs
     this.state = { x: this.INIT.x, y: this.INIT.y }
   }
 
-  componentWillReceiveProps(props) {
-    this.plancs = props.plancs
-  }
-
   set({ x, y }, lineFunc) {
-    if (
-      x >= this.MIN.x &&
-      x <= this.MAX.x &&
-      y >= this.MIN.y &&
-      y <= this.MAX.y
-    ) {
+    const isDotOutByY = y < this.MIN.y || y > this.MAX.y
+    const isDotOutByX = x > this.MAX.x || x < this.MIN.x
+    const isDotInTopPlanc = utils.isDotInSquare({ x, y }, this.props.topPlank)
+    const isDotInBottomPlanc = utils.isDotInSquare(
+      { x, y },
+      this.props.bottomPlank
+    )
+    const isDotMoving =
+      !isDotOutByY && !isDotOutByX && !isDotInTopPlanc && !isDotInBottomPlanc
+
+    console.log(
+      `isDotOutByY: ${isDotOutByY}; ` +
+        `isDotOutByX: ${isDotOutByX}; ` +
+        `isDotInTopPlanc: ${isDotInTopPlanc}; ` +
+        `isDotInBottomPlanc: ${isDotInBottomPlanc}; ` +
+        `isDotMoving: ${isDotMoving}`
+    )
+
+    if (isDotOutByY) {
+      this.stop()
+      return
+    }
+
+    if (isDotMoving) {
       this.setState({ x, y })
       return
     }
 
-    this.stop()
-    const { x: xRandom, y: yRandom } = utils.getRandomDot(
-      this.MIN,
-      this.MAX,
-      this.state
-    )
-
-    if (x < this.MIN.x || x > this.MAX.x) {
+    if (isDotOutByX) {
+      this.stop()
+      const xRandom = utils.getRandomDot(this.MIN, this.MAX, this.state).x
       const xAxis = x < this.MIN.x ? this.MIN.x : this.MAX.x
       const xCrossDot = {
         x: xAxis,
@@ -62,8 +76,16 @@ export default class Ball extends Component {
       return
     }
 
-    if (y < this.MIN.y || y > this.MAX.y) {
-      const yAxis = y < this.MIN.y ? this.MIN.y : this.MAX.y
+    if (isDotInBottomPlanc || isDotInTopPlanc) {
+      this.stop()
+      const yAxis = isDotInBottomPlanc
+        ? this.props.bottomPlank.topRightY
+        : this.props.topPlank.bottomLeftY
+      const yRandom = utils.getRandomDot(
+        isDotInBottomPlanc ? { x: this.MIN.x, y: yAxis } : this.MIN,
+        isDotInBottomPlanc ? this.MAX : { x: this.MAX.x, y: yAxis },
+        this.state
+      ).y
       const yCrossDot = {
         x: (yAxis - lineFunc.b) / lineFunc.a,
         y: yAxis
@@ -74,8 +96,6 @@ export default class Ball extends Component {
       })
       return
     }
-
-    this.move(this.state, utils.getRandomDot(this.MIN, this.MAX, this.state))
   }
 
   stop() {
