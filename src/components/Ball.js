@@ -74,20 +74,31 @@ export default class Ball extends Component {
       const yAxis = isDotInBottomPlanc
         ? this.props.bottomPlank.topRightY
         : this.props.topPlank.bottomLeftY
-      const yRandom = utils.getRandomDot(
+      const random = utils.getRandomDot(
         isDotInBottomPlanc ? { x: this.MIN.x, y: yAxis } : this.MIN,
         isDotInBottomPlanc ? this.MAX : { x: this.MAX.x, y: yAxis },
         this.state
-      ).y
-      const yCrossDot = {
-        x: (yAxis - lineFunc.b) / lineFunc.a,
-        y: yAxis
-      }
-      this.move(this.state, {
-        x: (yRandom - (yCrossDot.y + lineFunc.a * yCrossDot.x)) / -lineFunc.a,
-        y: yRandom
-      })
+      )
+      this.move(this.state, random)
       return
+      // this.stop()
+      // const yAxis = isDotInBottomPlanc
+      //   ? this.props.bottomPlank.topRightY
+      //   : this.props.topPlank.bottomLeftY
+      // const yRandom = utils.getRandomDot(
+      //   isDotInBottomPlanc ? { x: this.MIN.x, y: yAxis } : this.MIN,
+      //   isDotInBottomPlanc ? this.MAX : { x: this.MAX.x, y: yAxis },
+      //   this.state
+      // ).y
+      // const yCrossDot = {
+      //   x: (yAxis - lineFunc.b) / lineFunc.a,
+      //   y: yAxis
+      // }
+      // this.move(this.state, {
+      //   x: (yRandom - (yCrossDot.y + lineFunc.a * yCrossDot.x)) / -lineFunc.a,
+      //   y: yRandom
+      // })
+      // return
     }
   }
 
